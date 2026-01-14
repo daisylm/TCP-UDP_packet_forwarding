@@ -1,0 +1,96 @@
+Vagrant.configure("2") do |config|
+    #Here we define a Vm instance named : sender, with a configuration block
+    config.vm.define "sender" do |sender| #Vagrant way to define a VM, the "do" creates the variable "sender"
+        sender.vm.box = "ubuntu/focal64" #OS base image, Vagrant check it's cache for this box, if not found it downloads it from the official website
+        sender.vm.hostname = "sender" #sets sender as a hostname inside the OS guest
+
+        sender.vm.network "private_network", ip: "192.168.56.10" #here we create an private IP interface, where sender is put on this subnet
+
+        sender.vm.provider "virtualbox" do |vb|
+            vb.name = "network-sender"
+            vb.memory = 512 #RAM allocation to the VM, minimal but sufficient
+            vb.cpus = 1 #allocates CPU's cores 1core= 1socket= 1thread
+        end
+        sender.vm.provision "shell", inline: <<-SHELL
+            # Remove default route (through NAT)
+            ip route del default via 10.0.2.2 dev enp0s3 2>/dev/null || true
+      
+            # Set default gateway to tracker
+            ip route add default via 192.168.56.20 dev enp0s8
+      
+            # Display routing table for verification
+            echo "=== Receiver Routing Table ==="
+            ip route show
+  
+            # Test connectivity to tracker
+            echo "=== Testing Tracker Connectivity ==="
+            ping -c 2 192.168.56.20
+        SHELL
+      
+    end
+  
+    config.vm.define "tracker" do |tracker|
+        tracker.vm.box = "ubuntu/focal64"
+        tracker.vm.hostname = "tracker"
+        
+        tracker.vm.network "private_network", ip: "192.168.56.20"
+        tracker.vm.network "private_network", ip: "192.168.57.20"
+
+        tracker.vm.provider "virtualbox" do |vb|
+            vb.name = "tracker-vm"
+            vb.memory = 1024
+            vb.cpus = 1
+        end
+        tracker.vm.provision "shell", inline: <<-SHELL
+            # Enable IP forwarding
+            sysctl -w net.ipv4.ip_forward=1
+            echo "net.ipv4.ip_forward=1" | sudo tee -a /etc/sysctl.conf
+      
+            # Basic iptables rules for forwarding
+            sudo iptables -t nat -A POSTROUTING -o enp0s9 -j MASQUERADE
+            sudo iptables -A FORWARD -i enp0s8 -o enp0s9 -j ACCEPT
+            sudo iptables -A FORWARD -i enp0s9 -o enp0s8 -m state --state RELATED,ESTABLISHED -j ACCEPT
+      
+            # Display rules for verification
+            echo "=== IP Tables Rules ==="
+            iptables -t nat -L -n -v
+            echo "=== Forwarding Rules ==="
+            iptables -L FORWARD -n -v
+            
+            # Show interfaces
+            echo "=== Tracker Interfaces ==="
+            ip addr show | grep -E "enp0s|inet "
+        SHELL
+       
+    end
+
+    
+
+    config.vm.define "receiver" do |receiver|
+        receiver.vm.box = "ubuntu/focal64"
+        receiver.vm.hostname = "receiver"
+
+        receiver.vm.network "private_network", ip: "192.168.57.30"
+        receiver.vm.provider "virtualbox" do |vb|
+            vb.name = "network-receiver"
+            vb.memory = 512
+            vb.cpus = 1 
+        end
+        receiver.vm.provision "shell", inline: <<-SHELL
+            # Remove default route (through NAT)
+            ip route del default via 10.0.2.2 dev enp0s3 2>/dev/null || true
+      
+            # Set default gateway to tracker
+            ip route add default via 192.168.57.20 dev enp0s8
+      
+            # Display routing table for verification
+            echo "=== Receiver Routing Table ==="
+            ip route show
+            
+            # Test connectivity to tracker
+            echo "=== Testing Tracker Connectivity ==="
+            ping -c 2 192.168.57.20
+        SHELL
+    end
+   
+end
