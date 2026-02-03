@@ -15,6 +15,7 @@ Set up a virtual network environment to analyze packet forwarding performance be
                     
 
 *Test Methodology:*
+
 We generate UDP/TCP traffic using "iperf" from client to server. The router in the middle do the packet inspection and the forwarding between subnets, finally the server receive the packets by listening on port 5201 and do the traffic income measurement.
 The metrics we used to measure the performance of Virtual machines are:
   - Bitrate/Throughput: Mbps transmitted vs received
@@ -22,6 +23,7 @@ The metrics we used to measure the performance of Virtual machines are:
   - Jitter: Variation in packet arrival times
 
 *The setup Foundation*
-Environment: Local Virtualization
-Tools: Vagrant, VirtualBox, iperf3, Linux networking
-Reproducibility: Fully automated, version-controlled setup
+
+  - Environment: Local Virtualization
+  - Tools: Vagrant, VirtualBox, iperf3, Linux networking
+  - Reproducibility: Fully automated, version-controlled setup
