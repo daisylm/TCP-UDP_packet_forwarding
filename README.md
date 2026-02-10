@@ -18,7 +18,7 @@ Set up a virtual network environment to analyze packet forwarding performance be
 
 We generate UDP/TCP traffic using "iperf" from client to server. The router in the middle do the packet inspection and the forwarding between subnets, finally the server receive the packets by listening on port 5201 and do the traffic income measurement.
 For each Bandwidth value : 
-  - On server : iperf3 -s -1 -J > server.json
+  - On server : iperf3 -s -J > server.json
   - On Client : iperf3 -c <server-ip> -u -b <rate> -t 10 -J > client.json
 Each test produces one clean JSON file per side, enabling reproducible analysis.
 
