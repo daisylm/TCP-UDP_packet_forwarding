@@ -17,9 +17,10 @@ Set up a virtual network environment to analyze packet forwarding performance be
 *Test Methodology:*
 
 We generate UDP/TCP traffic using "iperf" from client to server. The router in the middle do the packet inspection and the forwarding between subnets, finally the server receive the packets by listening on port 5201 and do the traffic income measurement.
-For each Bandwidth value : 
+
+*UDP Case* For each Bandwidth value : 
   - On server : iperf3 -s -J > server.json
-  - On Client : iperf3 -c <server-ip> -u -b <rate> -t 10 -J > client.json
+  - On Client : iperf3 -c <server ip> -u -b < rate > -t 10 -J > client.json
 Each test produces one clean JSON file per side, enabling reproducible analysis.
 
 The metrics we used to measure the performance of Virtual machines are:
@@ -27,12 +28,14 @@ The metrics we used to measure the performance of Virtual machines are:
   - Packet Loss: Percentage of packets lost in transit
   - Jitter: Variation in packet arrival times
 
+
+*Mistakes to avoid ( for beginners)*
+
+  - NAT interface kept enabled, using Static routes added for internal subnets, where the routing decision relies on Longest Prefix Match (LPM) on both Client and Server, if not the Linux system by default send packets via default Gateway "NAT". Example : (on client section in Vagrant file we add : **sudo ip route add 192.168.20.0/24 via 192.168.10.1** )
+
 *The setup Foundation*
 
   - Environment: Local Virtualization
   - Tools: Vagrant, VirtualBox, iperf3, Linux networking
   - Reproducibility: Fully automated, version-controlled setup
 
-*Mistakes to avoid ( for beginners)*
-
-  - NAT interface kept enabled, using Static routes added for internal subnets, where the routing decision relies on Longest Prefix Match (LPM) on both Client and Server, if not the Linux system by default send packets via default Gateway "NAT". Example : (on client section in Vagrant file we add : **sudo ip route add 192.168.20.0/24 via 192.168.10.1** )
