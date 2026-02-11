@@ -23,7 +23,7 @@ We generate UDP/TCP traffic using "iperf" from client to server. The router in t
   - On Client : iperf3 -c < server ip > -u -b < rate > -t 10 -J > client.json
 Each test produces one clean JSON file per side, enabling reproducible analysis.
 
-*TCP Case* The bandwidth is defined by default, so we run :
+*TCP Case* The bandwidth is adjusted by TCP using congestion control, so we run :
   - On server: iperf3 -s -J > server.json
   - On client: iperf3 -c  < server ip > -t 10 -i 
 
