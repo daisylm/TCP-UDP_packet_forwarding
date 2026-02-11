@@ -20,14 +20,17 @@ We generate UDP/TCP traffic using "iperf" from client to server. The router in t
 
 *UDP Case* For each Bandwidth value : 
   - On server : iperf3 -s -J > server.json
-  - On Client : iperf3 -c <server ip> -u -b < rate > -t 10 -J > client.json
+  - On Client : iperf3 -c < server ip > -u -b < rate > -t 10 -J > client.json
 Each test produces one clean JSON file per side, enabling reproducible analysis.
+
+*TCP Case* The bandwidth is defined by default, so we run :
+  - On server: iperf3 -s -J > server.json
+  - On client: iperf3 -c  < server ip > -t 10 -i 
 
 The metrics we used to measure the performance of Virtual machines are:
   - Bitrate/Throughput: Mbps transmitted vs received
   - Packet Loss: Percentage of packets lost in transit
-  - Jitter: Variation in packet arrival times
-
+  - Jitter: Latency Variation in packet arrival times
 
 *Mistakes to avoid ( for beginners)*
 
