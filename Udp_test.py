@@ -256,7 +256,7 @@ class UDPBenchmark:
                 self.append_result(result)
 
                 if result["status"] == "failure":
-                    print("⚠️ Failure — extended cooldown")
+                    print("Failure — extended cooldown")
                     time.sleep(self.cooldown_failure)
                 else:
                     time.sleep(self.cooldown_success)
@@ -273,3 +273,4 @@ if __name__ == "__main__":
     )
 
     bench.run()
+
