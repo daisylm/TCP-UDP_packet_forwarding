@@ -241,7 +241,7 @@ class TCPBenchmark:
                 self.append_result(result)
 
                 if result["status"] == "failure": 
-                    print("⚠️ Failure detected — extended cooldown")
+                    print("Failure detected — extended cooldown")
                     time.sleep(self.cooldown_failure)
                 else:
                     time.sleep(self.cooldown_success)
@@ -260,3 +260,4 @@ if __name__ == "__main__":
     )
 
     bench.run()
+
